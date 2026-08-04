@@ -1,4 +1,4 @@
-const CACHE_NAME = "rail-start-europe-v29-51";
+const CACHE_NAME = "rail-start-europe-beta-1-0";
 const APP_SHELL = [
   "./",
   "./index.html",
