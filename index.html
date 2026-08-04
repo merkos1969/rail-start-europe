@@ -1085,6 +1085,11 @@ function gateway(from){
 }
 function routeSteps(fc,from,tc,to,gatewayStation){
  let a=[];
+ if(fc==="Ελλάδα" && tc==="Ελλάδα"){
+  a.push([`🚆 ${from} → ${to}`,"Εσωτερική διαδρομή στην Ελλάδα. Έλεγξε το διαθέσιμο δρομολόγιο και τυχόν λεωφορειακές υποκαταστάσεις στον επίσημο φορέα.","Ελλάδα"]);
+  a.push([`🚉 Άφιξη: ${stationNames[to]||to}`,"Τελικός προορισμός","ARRIVAL"]);
+  return a;
+ }
  const turkishIstanbul=(city)=>city==="Κωνσταντινούπολη"||city==="Istanbul";
  const addSofiaToTurkey=(destination)=>{
   a.push(["🚆 Sofia → Halkali","Διεθνές νυχτερινό τρένο. Το εισιτήριο και η υποχρεωτική κράτηση ελέγχονται στο διεθνές εκδοτήριο της BDZ.","BDZ International"]);
@@ -1191,16 +1196,22 @@ $("find").onclick=()=>{
  const fc=$("fromCountry").value,from=$("from").value,tc=$("toCountry").value,to=$("to").value;
  if(fc===tc&&from===to){alert("Διάλεξε διαφορετικό προορισμό.");return}
  const p=+$("passengers").value,cat=$("category").value;
- const hasGreekBorder=fc==="Ελλάδα"||tc==="Ελλάδα";
- const greekCity=fc==="Ελλάδα"?from:(tc==="Ελλάδα"?to:null);
- const g=greekCity?gateway(greekCity):[from,from,to];
+ const domesticGreek=fc==="Ελλάδα" && tc==="Ελλάδα";
+ const hasGreekBorder=!domesticGreek && (fc==="Ελλάδα"||tc==="Ελλάδα");
+ const greekCity=hasGreekBorder ? (fc==="Ελλάδα"?from:to) : null;
+ const g=domesticGreek ? [from,`${from} → ${to}`,to] : (greekCity?gateway(greekCity):[from,from,to]);
  const steps=routeSteps(fc,from,tc,to,g[0]),gatewayStation=g[0];
  const railPointDisplay=hasGreekBorder?gatewayStation:from;
  const isBulgarianBorderStart=fc==="Βουλγαρία" && tc!=="Βουλγαρία" && ["Svilengrad","Podkova","Kulata","Kardzhali"].includes(from);
  const cleanSequence=railPointsFromGeneratedSteps(fc,from,tc,to,gatewayStation);
  $("routeTitle").textContent=cleanSequence.map(x=>localizePlace(x,currentLanguage)).join(" → ");
  $("tripPills").innerHTML=`<span class="pill">📅 ${$("date").value}</span><span class="pill">🕘 ${$("time").value}</span><span class="pill">👥 ${p}</span><span class="pill">🎫 ${$("category").selectedOptions[0].text}</span>`;
-if(fc==="Ελλάδα"){
+if(domesticGreek){
+  $("gatewaySectionTitle").textContent="🧭 Εσωτερική διαδρομή στην Ελλάδα";
+  $("gatewayDirectionNote").textContent="Η διαδρομή παραμένει εντός Ελλάδας. Τα διαθέσιμα δρομολόγια και τυχόν λεωφορειακές υποκαταστάσεις επιβεβαιώνονται στον επίσημο φορέα.";
+  $("firstStationActionTitle").textContent="Πώς πάω στον σταθμό αναχώρησης";
+  $("gatewayCards").innerHTML="";
+ } else if(fc==="Ελλάδα"){
   $("gatewaySectionTitle").textContent="🚉 Σιδηροδρομικός σταθμός εκκίνησης";
   $("gatewayDirectionNote").textContent="Η ελληνική πόλη είναι μόνο το σημείο αναχώρησης του ταξιδιώτη. Το σιδηροδρομικό ταξίδι αρχίζει εκτός Ελλάδας, από τον επιλεγμένο συνοριακό σταθμό.";
   $("firstStationActionTitle").textContent="Πώς πάω στον σταθμό εκκίνησης";
@@ -1224,14 +1235,14 @@ if(fc==="Ελλάδα"){
   $("ticketPlanIntro").textContent="Η διεθνής διαδρομή προς Τουρκία χωρίζεται σε δύο κρατήσεις: Sofia–Halkali μέσω διεθνούς εκδοτηρίου BDZ και Halkali–προορισμός μέσω TCDD.";
  } else if(fc==="Τουρκία" && tc!=="Τουρκία"){
   $("ticketPlanIntro").textContent="Η διαδρομή από Τουρκία χωρίζεται συνήθως σε TCDD έως Halkali και ξεχωριστό διεθνές εισιτήριο Halkali–Sofia.";
+ } else if(fc===tc){
+  $("ticketPlanIntro").textContent=`Για εσωτερικές διαδρομές στη χώρα ${fc}, αγορά και δρομολόγια από ${mainProvider.name}.`;
  } else if(fc==="Ελλάδα"){
   $("ticketPlanIntro").textContent=`Το σκέλος έως Sofia ανοίγει στη BDZ. Για τη διεθνή συνέχεια έλεγξε BDZ και τον φορέα ${mainProvider.name}.`;
  } else if(tc==="Ελλάδα"){
   $("ticketPlanIntro").textContent=`Η διεθνής αναχώρηση ανοίγει στον φορέα ${mainProvider.name}. Το Sofia–${gatewayStation} ανοίγει στη BDZ.`;
  } else if(isBulgarianBorderStart){
   $("ticketPlanIntro").textContent=`Το ${localizePlace(from)}–Σόφια ανοίγει στη BDZ. Η διεθνής συνέχεια Σόφια–${localizePlace(to)} ανοίγει στη DB / DB Navigator.`;
- } else if(fc===tc){
-  $("ticketPlanIntro").textContent=`Για εσωτερικές διαδρομές στη χώρα ${fc}, αγορά και δρομολόγια από ${mainProvider.name}.`;
  } else {
   $("ticketPlanIntro").textContent=`Η διεθνής αναζήτηση και κράτηση ανοίγει στη DB / DB Navigator.`;
  }
@@ -1242,7 +1253,7 @@ if(fc==="Ελλάδα"){
  const q=encodeURIComponent(`${st}, ${to}`),cq=encodeURIComponent(`${to}, ${tc}`),date=$("date").value;
  $("stationMap").href=`https://www.google.com/maps/search/?api=1&query=${q}`;$("cityMap").href=`https://www.google.com/maps/search/?api=1&query=${cq}`;$("hotelsMap").href=`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent("hotels near "+st)}`;
  $("booking").href=`https://www.booking.com/searchresults.html?ss=${cq}&checkin=${date}`;$("airbnb").href=`https://www.airbnb.com/s/${cq}/homes`;
- current={fc,from,tc,to,date,time:$("time").value,p,gateway:railPointDisplay,station:st,direction:fc==="Ελλάδα"?"outbound":(tc==="Ελλάδα"?"return":"international")};
+ current={fc,from,tc,to,date,time:$("time").value,p,gateway:railPointDisplay,station:st,direction:domesticGreek?"domestic":(fc==="Ελλάδα"?"outbound":(tc==="Ελλάδα"?"return":"international"))};
  saveHistory(current);renderCity(to);$("result").style.display="block";refreshDynamicRouteLanguage();$("result").scrollIntoView({behavior:"smooth",block:"start"});
 };
 $("delay").onchange=$("next").onchange=()=>{const d=+$("delay").value,n=+$("next").value,r=$("delayResult");if(d===0){r.className="warning";r.textContent="Η κατάσταση είναι κανονική."}else if(d<n-10){r.className="warning";r.textContent="Πιθανότατα προλαβαίνεις, αλλά κατευθύνσου αμέσως στην επόμενη αποβάθρα."}else{r.className="warning danger";r.textContent="Υπάρχει κίνδυνος χαμένης ανταπόκρισης. Έλεγξε αμέσως την εφαρμογή του φορέα και μίλησε με το προσωπικό του σταθμού."}};
@@ -1793,35 +1804,36 @@ function dynamicRouteCopy(lang, data){
   const toName=localizePlace(data.to,lang);
   const gatewayName=localizePlace(data.gateway,lang);
 
+  const domesticGreek=data.fc==="Ελλάδα" && data.tc==="Ελλάδα";
   if(lang==="en"){
     return {
-      arrivalTitle: data.tc==="Ελλάδα" ? toName : (data.station || toName),
-      arrivalInfo: data.tc==="Ελλάδα"
-        ? `Final arrival in ${toName} after the road transfer from ${gatewayName}.`
-        : `Main arrival station in ${toName}. Check metro, tram, buses and the route to your accommodation.`,
-      accessNote: data.fc==="Ελλάδα" ? `${fromName} → ${gatewayName}` : (data.tc==="Ελλάδα" ? `${gatewayName} → ${toName}` : "Not required"),
-      trainOriginNote: data.fc==="Ελλάδα" ? `From ${gatewayName}` : (data.tc==="Ελλάδα" ? `To ${gatewayName}` : `From ${fromName}`)
+      arrivalTitle: domesticGreek ? toName : (data.tc==="Ελλάδα" ? toName : (data.station || toName)),
+      arrivalInfo: domesticGreek
+        ? `Final arrival at ${toName}. Check the official operator for the available domestic service.`
+        : (data.tc==="Ελλάδα" ? `Final arrival in ${toName} after the road transfer from ${gatewayName}.` : `Main arrival station in ${toName}. Check metro, tram, buses and the route to your accommodation.`),
+      accessNote: domesticGreek ? "Not required" : (data.fc==="Ελλάδα" ? `${fromName} → ${gatewayName}` : (data.tc==="Ελλάδα" ? `${gatewayName} → ${toName}` : "Not required")),
+      trainOriginNote: domesticGreek ? `From ${fromName}` : (data.fc==="Ελλάδα" ? `From ${gatewayName}` : (data.tc==="Ελλάδα" ? `To ${gatewayName}` : `From ${fromName}`))
     };
   }
 
   if(lang==="de"){
     return {
-      arrivalTitle: data.tc==="Ελλάδα" ? toName : (data.station || toName),
-      arrivalInfo: data.tc==="Ελλάδα"
-        ? `Endgültige Ankunft in ${toName} nach der Straßenfahrt ab ${gatewayName}.`
-        : `Hauptankunftsbahnhof in ${toName}. Prüfe U-Bahn, Straßenbahn, Busse und den Weg zur Unterkunft.`,
-      accessNote: data.fc==="Ελλάδα" ? `${fromName} → ${gatewayName}` : (data.tc==="Ελλάδα" ? `${gatewayName} → ${toName}` : "Nicht erforderlich"),
-      trainOriginNote: data.fc==="Ελλάδα" ? `Ab ${gatewayName}` : (data.tc==="Ελλάδα" ? `Bis ${gatewayName}` : `Ab ${fromName}`)
+      arrivalTitle: domesticGreek ? toName : (data.tc==="Ελλάδα" ? toName : (data.station || toName)),
+      arrivalInfo: domesticGreek
+        ? `Endgültige Ankunft in ${toName}. Prüfe die verfügbare Inlandsverbindung beim offiziellen Betreiber.`
+        : (data.tc==="Ελλάδα" ? `Endgültige Ankunft in ${toName} nach der Straßenfahrt ab ${gatewayName}.` : `Hauptankunftsbahnhof in ${toName}. Prüfe U-Bahn, Straßenbahn, Busse und den Weg zur Unterkunft.`),
+      accessNote: domesticGreek ? "Nicht erforderlich" : (data.fc==="Ελλάδα" ? `${fromName} → ${gatewayName}` : (data.tc==="Ελλάδα" ? `${gatewayName} → ${toName}` : "Nicht erforderlich")),
+      trainOriginNote: domesticGreek ? `Ab ${fromName}` : (data.fc==="Ελλάδα" ? `Ab ${gatewayName}` : (data.tc==="Ελλάδα" ? `Bis ${gatewayName}` : `Ab ${fromName}`))
     };
   }
 
   return {
-    arrivalTitle: data.tc==="Ελλάδα" ? data.to : (data.station || data.to),
-    arrivalInfo: data.tc==="Ελλάδα"
-      ? `Τελική άφιξη στην ${data.to} μετά την οδική μετάβαση από ${data.gateway}.`
-      : `Κύριος σταθμός άφιξης στην πόλη ${data.to}. Έλεγξε μετρό, τραμ, λεωφορεία και διαδρομή προς τη διαμονή σου.`,
-    accessNote: data.fc==="Ελλάδα" ? `${data.from} → ${data.gateway}` : (data.tc==="Ελλάδα" ? `${data.gateway} → ${data.to}` : "Δεν απαιτείται"),
-    trainOriginNote: data.fc==="Ελλάδα" ? `Από ${data.gateway}` : (data.tc==="Ελλάδα" ? `Έως ${data.gateway}` : `Από ${data.from}`)
+    arrivalTitle: domesticGreek ? data.to : (data.tc==="Ελλάδα" ? data.to : (data.station || data.to)),
+    arrivalInfo: domesticGreek
+      ? `Τελική άφιξη στην ${data.to}. Έλεγξε το διαθέσιμο εσωτερικό δρομολόγιο στον επίσημο φορέα.`
+      : (data.tc==="Ελλάδα" ? `Τελική άφιξη στην ${data.to} μετά την οδική μετάβαση από ${data.gateway}.` : `Κύριος σταθμός άφιξης στην πόλη ${data.to}. Έλεγξε μετρό, τραμ, λεωφορεία και διαδρομή προς τη διαμονή σου.`),
+    accessNote: domesticGreek ? "Δεν απαιτείται" : (data.fc==="Ελλάδα" ? `${data.from} → ${data.gateway}` : (data.tc==="Ελλάδα" ? `${data.gateway} → ${data.to}` : "Δεν απαιτείται")),
+    trainOriginNote: domesticGreek ? `Από ${data.from}` : (data.fc==="Ελλάδα" ? `Από ${data.gateway}` : (data.tc==="Ελλάδα" ? `Έως ${data.gateway}` : `Από ${data.from}`))
   };
 }
 
@@ -1889,9 +1901,10 @@ function refreshDynamicRouteLanguage(){
   const sequence=railPointsFromGeneratedSteps(current.fc,current.from,current.tc,current.to,current.gateway);
 
   $("routeTitle").textContent=sequence.map(x=>localizePlace(x,currentLanguage)).join(" → ");
-  $("firstStationRouteText").textContent=current.fc==="Ελλάδα"
-    ? `${fromName} → ${gatewayName}`
-    : (current.tc==="Ελλάδα" ? `${fromName} → ${localizePlace(stationNames[current.from]||current.from,currentLanguage)}` : fromName);
+  const domesticGreek=current.fc==="Ελλάδα" && current.tc==="Ελλάδα";
+  $("firstStationRouteText").textContent=domesticGreek
+    ? fromName
+    : (current.fc==="Ελλάδα" ? `${fromName} → ${gatewayName}` : (current.tc==="Ελλάδα" ? `${fromName} → ${localizePlace(stationNames[current.from]||current.from,currentLanguage)}` : fromName));
   syncJourneyMapFromRoute(current.fc,current.from,current.tc,current.to,current.gateway);
 
   const freshSteps=routeSteps(current.fc,current.from,current.tc,current.to,current.gateway);
@@ -2081,7 +2094,8 @@ function updatePlannerMapButtons(){
  const to=$("to")?.value;
  if(!fc||!from||!tc||!to) return;
 
- const isGreekStart=fc==="Ελλάδα";
+ const domesticGreek=fc==="Ελλάδα" && tc==="Ελλάδα";
+ const isGreekStart=fc==="Ελλάδα" && !domesticGreek;
  const startingStation=isGreekStart
    ? gateway(from)[0]
    : (stationNames[from]||`${from} Central Station`);
@@ -2092,9 +2106,9 @@ function updatePlannerMapButtons(){
  $("firstStationDirections").href=`https://www.google.com/maps/dir/?api=1&origin=${originQuery}&destination=${stationQuery}&travelmode=${isGreekStart?"driving":"transit"}`;
  $("firstStationRouteText").textContent=`${localizePlace(from)} → ${localizeRouteString(startingStation)}`;
 
- const mapGateway=fc==="Ελλάδα"
-   ? gateway(from)[0]
-   : (tc==="Ελλάδα" ? gateway(to)[0] : startingStation);
+ const mapGateway=domesticGreek
+   ? from
+   : (fc==="Ελλάδα" ? gateway(from)[0] : (tc==="Ελλάδα" ? gateway(to)[0] : startingStation));
  syncJourneyMapFromRoute(fc,from,tc,to,mapGateway);
 }
 
