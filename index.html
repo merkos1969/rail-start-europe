@@ -963,13 +963,13 @@ footer{
 </section>
 
 <section id="city" class="section">
- <div class="card"><span class="tag">ΟΔΗΓΟΣ ΠΟΛΗΣ</span><h3 id="cityTitle" style="margin-top:10px">Βιέννη</h3><p id="cityIntro" class="muted"></p><div class="grid3"><div class="status"><b id="cityDays">2 ημέρες</b><small>πρόταση παραμονής</small></div><div class="status"><b id="cityTransport">Μετρό / τραμ</b><small>τοπική μετακίνηση</small></div><div class="status"><b id="cityBudget">€€</b><small>ενδεικτικό κόστος</small></div></div></div>
+ <div class="card"><span class="tag">ΟΔΗΓΟΣ ΠΟΛΗΣ</span><h3 id="cityTitle" style="margin-top:10px">Βιέννη</h3><p id="cityIntro" class="muted"></p><div class="grid3"><div class="status"><b id="cityDays">2 ημέρες</b><small id="cityDaysLabel">πρόταση παραμονής</small></div><div class="status"><b id="cityTransport">Μετρό / τραμ</b><small id="cityTransportLabel">τοπική μετακίνηση</small></div><div class="status"><b id="cityBudget">€€</b><small id="cityBudgetLabel">ενδεικτικό κόστος</small></div></div></div>
  <div class="card"><h3>🏛️ Αξιοθέατα</h3><div class="attractions" id="attractions"></div></div>
  <div class="card"><h3>🗓️ Πρόγραμμα 2 ημερών</h3><div id="itinerary"></div></div>
 </section>
 
 <section id="favorites" class="section">
- <div class="card"><h3>📊 Κατάσταση εφαρμογής</h3><div class="statusgrid"><div class="status"><b id="onlineStatus">Online</b><small>σύνδεση</small></div><div class="status"><b id="favCount">0</b><small>αγαπημένα</small></div><div class="status"><b id="historyCount">0</b><small>πρόσφατες αναζητήσεις</small></div></div></div>
+ <div class="card"><h3 id="appStatusTitle">📊 Κατάσταση εφαρμογής</h3><div class="statusgrid"><div class="status"><b id="onlineStatus">Online</b><small id="onlineStatusLabel">σύνδεση</small></div><div class="status"><b id="favCount">0</b><small id="favCountLabel">αγαπημένα</small></div><div class="status"><b id="historyCount">0</b><small id="historyCountLabel">πρόσφατες αναζητήσεις</small></div></div></div>
  <div class="card"><div class="itemtop"><h3>❤️ Αγαπημένες διαδρομές</h3><button class="smallbtn" id="clearFavs">Καθαρισμός</button></div><div id="favList"></div></div>
  <div class="card"><div class="itemtop"><h3>🕘 Πρόσφατες αναζητήσεις</h3><button class="smallbtn" id="clearHistory">Καθαρισμός</button></div><div id="historyList"></div></div>
 </section>
@@ -1339,8 +1339,8 @@ function renderBudgetEstimate(steps,fc,tc,category,passengers){
  $("changes").textContent=String(changes);
  $("budgetLegs").textContent=String(railSteps.length);
  if(currentLanguage==="en"){
-  $("perPerson").textContent="Check fare";
-  $("grand").textContent="Official operator";
+  $("perPerson").textContent="Check ticket fare";
+  $("grand").textContent="Final confirmation";
   $("budgetTag").textContent="FARE CHECK";
   $("budgetTitle").textContent="Check ticket prices with official operators";
   $("budgetLegsLabel").textContent="Rail legs";
@@ -1348,8 +1348,8 @@ function renderBudgetEstimate(steps,fc,tc,category,passengers){
   $("budgetStatus").textContent="Check required";
   $("budgetNotice").textContent="No indicative amount is shown because fares vary by travel date, availability, ticket type and booking time. Confirm the final price with the official operator for each rail leg.";
  }else if(currentLanguage==="de"){
-  $("perPerson").textContent="Preis prüfen";
-  $("grand").textContent="Offizieller Anbieter";
+  $("perPerson").textContent="Fahrpreis prüfen";
+  $("grand").textContent="Endgültige Bestätigung";
   $("budgetTag").textContent="PREISPRÜFUNG";
   $("budgetTitle").textContent="Ticketpreise bei offiziellen Anbietern prüfen";
   $("budgetLegsLabel").textContent="Bahnabschnitte";
@@ -1357,8 +1357,8 @@ function renderBudgetEstimate(steps,fc,tc,category,passengers){
   $("budgetStatus").textContent="Prüfung erforderlich";
   $("budgetNotice").textContent="Es wird kein Schätzbetrag angezeigt, da Fahrpreise vom Reisedatum, der Verfügbarkeit, der Ticketart und dem Buchungszeitpunkt abhängen. Den Endpreis für jeden Bahnabschnitt beim offiziellen Anbieter prüfen.";
  }else{
-  $("perPerson").textContent="Έλεγχος";
-  $("grand").textContent="Επίσημος φορέας";
+  $("perPerson").textContent="Έλεγχος τιμής";
+  $("grand").textContent="Τελική επιβεβαίωση";
   $("budgetTag").textContent="ΕΛΕΓΧΟΣ ΤΙΜΗΣ";
   $("budgetTitle").textContent="Τιμή εισιτηρίων στους επίσημους φορείς";
   $("budgetLegsLabel").textContent="Σιδηροδρομικά σκέλη";
@@ -1674,7 +1674,26 @@ $("delay").onchange=$("next").onchange=()=>{const d=+$("delay").value,n=+$("next
 $("save").onclick=()=>{if(!current)return;const a=get("railFavs");if(!a.some(x=>x.from===current.from&&x.to===current.to&&x.date===current.date)){a.unshift(current);set("railFavs",a.slice(0,20));renderSaved();alert("Η διαδρομή αποθηκεύτηκε.")}};
 function get(k){try{return JSON.parse(localStorage.getItem(k)||"[]")}catch{return[]}}function set(k,v){localStorage.setItem(k,JSON.stringify(v))}
 function saveHistory(x){const a=get("railHistory");a.unshift(x);set("railHistory",a.slice(0,20));renderSaved()}
-function renderSaved(){const fav=get("railFavs"),hist=get("railHistory");$("favCount").textContent=fav.length;$("historyCount").textContent=hist.length;$("favList").innerHTML=fav.length?fav.map((x,i)=>`<div class="item"><div class="itemtop"><div><h4>${x.from} → ${x.to}</h4><p>${x.date} · ${x.p} επιβάτες · ${x.budget?`${x.budget.low}–${x.budget.high} € / επιβάτη`:"τιμή στον επίσημο φορέα"}</p></div></div><div class="itemactions"><button class="smallbtn" onclick="loadTrip('railFavs',${i})">Άνοιγμα</button><button class="smallbtn" onclick="removeTrip('railFavs',${i})">Διαγραφή</button></div></div>`).join(""):'<p class="muted">Δεν υπάρχουν αγαπημένες διαδρομές.</p>';$("historyList").innerHTML=hist.length?hist.map((x,i)=>`<div class="item"><h4>${x.from} → ${x.to}</h4><p>${x.date} · ${x.budget?`${x.budget.low}–${x.budget.high} € / επιβάτη`:"τιμή στον επίσημο φορέα"}</p><div class="itemactions"><button class="smallbtn" onclick="loadTrip('railHistory',${i})">Άνοιγμα</button></div></div>`).join(""):'<p class="muted">Δεν υπάρχουν πρόσφατες αναζητήσεις.</p>'}
+function savedUi(){
+ return currentLanguage==="de"
+  ?{passenger:"Fahrgast",passengers:"Fahrgäste",fare:"Preis beim offiziellen Betreiber",open:"Öffnen",remove:"Löschen",noFav:"Keine Favoriten gespeichert.",noHistory:"Keine letzten Suchanfragen."}
+  :currentLanguage==="en"
+   ?{passenger:"passenger",passengers:"passengers",fare:"fare from the official operator",open:"Open",remove:"Delete",noFav:"No favourite routes saved.",noHistory:"No recent searches."}
+   :{passenger:"επιβάτης",passengers:"επιβάτες",fare:"τιμή στον επίσημο φορέα",open:"Άνοιγμα",remove:"Διαγραφή",noFav:"Δεν υπάρχουν αγαπημένες διαδρομές.",noHistory:"Δεν υπάρχουν πρόσφατες αναζητήσεις."};
+}
+function renderSaved(){
+ const fav=get("railFavs"),hist=get("railHistory"),u=savedUi();
+ $("favCount").textContent=fav.length;$("historyCount").textContent=hist.length;
+ const card=(x,i,key,canRemove)=>{
+  const from=localizePlace(x.from,currentLanguage),to=localizePlace(x.to,currentLanguage);
+  const count=Number(x.p||1),people=count===1?u.passenger:u.passengers;
+  const price=x.budget?`${x.budget.low}–${x.budget.high} € / ${u.passenger}`:u.fare;
+  return `<div class="item"><div class="itemtop"><div><h4>${from} → ${to}</h4><p>${x.date}${key==="railFavs"?` · ${count} ${people}`:""} · ${price}</p></div></div><div class="itemactions"><button class="smallbtn" onclick="loadTrip('${key}',${i})">${u.open}</button>${canRemove?`<button class="smallbtn" onclick="removeTrip('${key}',${i})">${u.remove}</button>`:""}</div></div>`;
+ };
+ $("favList").innerHTML=fav.length?fav.map((x,i)=>card(x,i,"railFavs",true)).join(""):`<p class="muted">${u.noFav}</p>`;
+ $("historyList").innerHTML=hist.length?hist.map((x,i)=>card(x,i,"railHistory",false)).join(""):`<p class="muted">${u.noHistory}</p>`;
+}
+
 window.removeTrip=(k,i)=>{const a=get(k);a.splice(i,1);set(k,a);renderSaved()};window.loadTrip=(k,i)=>{const x=get(k)[i];if(!x)return;$("fromCountry").value=x.fc;fillCities("fromCountry","from");$("from").value=x.from;$("toCountry").value=x.tc;fillCities("toCountry","to");$("to").value=x.to;$("date").value=x.date;if(x.p)$("passengers").value=String(x.p);if(x.category)$("category").value=x.category;document.querySelector('[data-section="planner"]').click();$("find").click()};
 
 $("saveFavouriteRoute").onclick=()=>{
@@ -1735,7 +1754,7 @@ function renderStations(filter=""){
       : `<span class="stationStatus yes">✔ ${tr("Υπάρχει σιδηροδρομικός σταθμός στην πόλη")}</span>`;
     return `<article class="station ${statusClass}">
      <span class="tag">${localizePlace(o.c).toUpperCase()}</span>
-     <h4>🚉 ${tr(info.station)}</h4>
+     <h4>🚉 ${currentLanguage==="el"?info.station:(currentLanguage==="de"?`Bahnhof ${localizePlace(o.x,currentLanguage)}`:`${localizePlace(o.x,currentLanguage)} Railway Station`)}</h4>
      <p>${localizePlace(o.x)}</p>
      ${statusBadge}
      ${info.note?`<p>${tr(info.note)}</p>`:""}
@@ -1768,6 +1787,11 @@ function renderCity(name){
  };
  const tr=value=>translateTextValue(String(value),currentLanguage);
  const cityName=localizePlace(name,currentLanguage);
+ const cityPack=uiPack();
+ if($("cityDays")) $("cityDays").textContent=cityPack.cityDays;
+ if($("cityDaysLabel")) $("cityDaysLabel").textContent=cityPack.stay;
+ if($("cityTransportLabel")) $("cityTransportLabel").textContent=cityPack.transport;
+ if($("cityBudgetLabel")) $("cityBudgetLabel").textContent=cityPack.cost;
  $("cityTitle").textContent=cityName;
  $("cityIntro").textContent=tr(d.intro).replace(name,cityName);
  $("cityTransport").textContent=tr(d.transport);
@@ -1822,7 +1846,7 @@ $("gatewayBtn").onclick=()=>{
   <p class="warning">Οι σταθμοί παρουσιάζονται ως σημεία πρόσβασης κοντά στα σύνορα. Πριν φύγεις, έλεγξε ότι λειτουργεί το συγκεκριμένο δρομολόγιο και πώς θα μεταβείς στον σταθμό.</p>`;
 };
 $("closeHelp").onclick=()=>$("helpModal").classList.remove("open");$("helpModal").onclick=e=>{if(e.target===$("helpModal"))$("helpModal").classList.remove("open")};
-function network(){const on=navigator.onLine;$("offline").style.display=on?"none":"block";$("onlineStatus").textContent=on?"Online":"Offline"}window.addEventListener("online",network);window.addEventListener("offline",network);
+function network(){const on=navigator.onLine;$("offline").style.display=on?"none":"block";const lang=$("langSelect")?.value||document.documentElement.lang||"el";const pack=CRITICAL_UI?.[lang]||CRITICAL_UI.el;$("onlineStatus").textContent=on?pack.online:pack.offline}window.addEventListener("online",network);window.addEventListener("offline",network);
 
 function openDrawer(){$("drawer").classList.add("open");$("drawerOverlay").classList.add("open");document.body.classList.add("drawerLocked")}
 function closeDrawer(){$("drawer").classList.remove("open");$("drawerOverlay").classList.remove("open");document.body.classList.remove("drawerLocked")}
@@ -1852,33 +1876,42 @@ let deferredInstallPrompt=null;
 const isStandalone=()=>window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone===true;
 const isIOS=()=>/iphone|ipad|ipod/i.test(navigator.userAgent);
 
+function activeUiLanguage(){return $("langSelect")?.value||document.documentElement.lang||"el"}
 function updateInstallButtonState(){
  const btn=$("drawerInstall");
  if(!btn) return;
  const label=btn.querySelector("span:last-child");
+ const lang=activeUiLanguage();
+ const text=lang==="de"?{install:"App installieren",installed:"App ist installiert"}:lang==="en"?{install:"Install app",installed:"App installed"}:{install:"Εγκατάσταση εφαρμογής",installed:"Η εφαρμογή είναι εγκατεστημένη"};
  if(isStandalone()){
   btn.classList.add("installed");
-  if(label) label.textContent="Η εφαρμογή είναι εγκατεστημένη";
+  if(label) label.textContent=text.installed;
  }else{
   btn.classList.remove("installed");
-  if(label) label.textContent="Εγκατάσταση εφαρμογής";
+  if(label) label.textContent=text.install;
  }
 }
 
 function showInstallInstructions(){
  const msg=$("installMessage");
  const confirm=$("installConfirmBtn");
+ const lang=activeUiLanguage();
+ const copy={
+  el:{already:"<p><strong>Η εφαρμογή είναι ήδη εγκατεστημένη.</strong></p><p>Μπορείς να την ανοίξεις από το εικονίδιο στην αρχική οθόνη.</p>",ios:"<p><strong>iPhone / Safari</strong></p><p>Πάτησε το εικονίδιο <strong>Κοινή χρήση</strong> και μετά <strong>Προσθήκη στην οθόνη αφετηρίας</strong>.</p>",ready:"<p>Η εφαρμογή είναι έτοιμη να εγκατασταθεί στη συσκευή σου.</p><p>Μετά την εγκατάσταση θα ανοίγει από το δικό της εικονίδιο.</p>",manual:"<p><strong>Android / Chrome</strong></p><p>Άνοιξε το μενού του browser και επίλεξε <strong>Εγκατάσταση εφαρμογής</strong> ή <strong>Προσθήκη στην αρχική οθόνη</strong>.</p><p class='small'>Η επιλογή εμφανίζεται μόνο όταν η σελίδα λειτουργεί μέσω HTTPS και έχουν ανέβει σωστά το manifest, το service worker και τα εικονίδια.</p>"},
+  en:{already:"<p><strong>The app is already installed.</strong></p><p>Open it from its icon on your home screen.</p>",ios:"<p><strong>iPhone / Safari</strong></p><p>Tap <strong>Share</strong>, then <strong>Add to Home Screen</strong>.</p>",ready:"<p>The app is ready to be installed on your device.</p><p>After installation, it will open from its own icon.</p>",manual:"<p><strong>Android / Chrome</strong></p><p>Open the browser menu and select <strong>Install app</strong> or <strong>Add to Home screen</strong>.</p><p class='small'>This option appears only when the page uses HTTPS and the manifest, service worker and icons are correctly uploaded.</p>"},
+  de:{already:"<p><strong>Die App ist bereits installiert.</strong></p><p>Du kannst sie über das Symbol auf dem Startbildschirm öffnen.</p>",ios:"<p><strong>iPhone / Safari</strong></p><p>Tippe auf <strong>Teilen</strong> und anschließend auf <strong>Zum Home-Bildschirm</strong>.</p>",ready:"<p>Die App kann jetzt auf deinem Gerät installiert werden.</p><p>Nach der Installation öffnet sie sich über ihr eigenes Symbol.</p>",manual:"<p><strong>Android / Chrome</strong></p><p>Öffne das Browsermenü und wähle <strong>App installieren</strong> oder <strong>Zum Startbildschirm hinzufügen</strong>.</p><p class='small'>Diese Option erscheint nur bei HTTPS und korrekt hochgeladenem Manifest, Service Worker und Symbolen.</p>"}
+ }[lang]||null;
  if(isStandalone()){
-  msg.innerHTML="<p><strong>Η εφαρμογή είναι ήδη εγκατεστημένη.</strong></p><p>Μπορείς να την ανοίξεις από το εικονίδιο στην αρχική οθόνη.</p>";
+  msg.innerHTML=copy.already;
   confirm.style.display="none";
  }else if(isIOS()){
-  msg.innerHTML="<p><strong>iPhone / Safari</strong></p><p>Πάτησε το εικονίδιο <strong>Κοινή χρήση</strong> και μετά <strong>Προσθήκη στην οθόνη αφετηρίας</strong>.</p>";
+  msg.innerHTML=copy.ios;
   confirm.style.display="none";
  }else if(deferredInstallPrompt){
-  msg.innerHTML="<p>Η εφαρμογή είναι έτοιμη να εγκατασταθεί στη συσκευή σου.</p><p>Μετά την εγκατάσταση θα ανοίγει από το δικό της εικονίδιο.</p>";
+  msg.innerHTML=copy.ready;
   confirm.style.display="block";
  }else{
-  msg.innerHTML="<p><strong>Android / Chrome</strong></p><p>Άνοιξε το μενού του browser και επίλεξε <strong>Εγκατάσταση εφαρμογής</strong> ή <strong>Προσθήκη στην αρχική οθόνη</strong>.</p><p class='small'>Η επιλογή εμφανίζεται μόνο όταν η σελίδα λειτουργεί μέσω HTTPS και έχουν ανέβει σωστά το manifest, το service worker και τα εικονίδια.</p>";
+  msg.innerHTML=copy.manual;
   confirm.style.display="none";
  }
  $("installModal").classList.add("show");
@@ -2234,6 +2267,11 @@ Object.assign(I18N.de,{
   "ακτή Μαύρης Θάλασσας":"Schwarzmeerküste"
 });
 
+
+// Beta 1.5 final translation audit — exact phrases to prevent mixed-language output.
+Object.assign(I18N.en, {"Μενού • BETA 1.5":"Menu • BETA 1.5","ΚΥΡΙΑ":"MAIN","⚠️ Είσαι offline — λειτουργούν τα αποθηκευμένα δεδομένα.":"⚠️ You are offline — saved data remains available.","🚆 Διαδρομή":"🚆 Route","📍 Από πού;":"📍 Starting point","🚉 Σταθμοί":"🚉 Stations","🏛️ Πόλη":"🏛️ City","❤️ Αγαπημένα":"❤️ Favourites","κύριο ευρωπαϊκό δίκτυο":"main European network","Άφιξη:":"Arrival:","Τελικός προορισμός":"Final destination","Ξενοδοχεία στον χάρτη":"Hotels on the map","Η εφαρμογή είναι βοηθητικός ταξιδιωτικός οδηγός. Οι πραγματικές ώρες, τιμές, διαθεσιμότητα, απεργίες και αλλαγές επιβεβαιώνονται πάντα επίσημα.":"The app is a travel-planning assistant. Actual times, fares, availability, strikes and train changes must always be confirmed through official sources.","Έλεγξε πρώτα τον πίνακα αναχωρήσεων και μετά τον επίσημο φορέα. Μην αγοράσεις νέο εισιτήριο πριν μιλήσεις με προσωπικό, ειδικά με ενιαίο εισιτήριο.":"Check the departure board first and then the official operator. Do not buy a new ticket before speaking to staff, especially when travelling on a through ticket.","Σε ακύρωση ή μεγάλη καθυστέρηση μπορεί να δικαιούσαι επαναδρομολόγηση, επιστροφή χρημάτων ή αποζημίωση. Οι τελικοί όροι επιβεβαιώνονται στον φορέα έκδοσης.":"In the event of cancellation or a long delay, you may be entitled to rerouting, a refund or compensation. Confirm the final conditions with the ticket issuer.","Κράτησε εισιτήριο, στιγμιότυπο καθυστέρησης ή ακύρωσης, αποδείξεις εξόδων και γραπτή επιβεβαίωση.":"Keep your ticket, a screenshot of the delay or cancellation, expense receipts and written confirmation.","Μην πετάξεις εισιτήρια ή αποδείξεις μέχρι να ολοκληρωθεί το αίτημα.":"Do not discard tickets or receipts until the claim has been completed.","Χρησιμοποίησε εκδοτήριο, γραφείο πληροφοριών ή την επίσημη ιστοσελίδα της χώρας όπου παρουσιάστηκε το πρόβλημα.":"Use a ticket office, information desk or the official website for the country where the problem occurred.","Επίσημος φορέας προορισμού":"Official operator at destination","ΓΡΗΓΟΡΟΣ ΟΔΗΓΟΣ":"QUICK GUIDE","Τι κάνω αμέσως":"What to do immediately","Κράτησε στιγμιότυπο καθυστέρησης ή ακύρωσης.":"Keep a screenshot of the delay or cancellation.","Μίλησε με προσωπικό πριν αγοράσεις νέο εισιτήριο.":"Speak to staff before buying a new ticket.","Ζήτησε γραπτή επιβεβαίωση αν χάθηκε η ανταπόκριση.":"Ask for written confirmation if you miss a connection.","Φύλαξε όλες τις αποδείξεις.":"Keep all receipts.","Έλεγξε αν τα εισιτήρια είναι ενιαία ή ξεχωριστά.":"Check whether your tickets are through tickets or separate tickets.","Διάλεξε ελληνική πόλη και θα δεις τους κοντινότερους σιδηροδρομικούς σταθμούς κοντά στα σύνορα.":"Choose a Greek city to see the most practical railway stations near the border.","Διάλεξε πόλη και πάτησε το κουμπί.":"Choose a city and press the button.","Δεν υπάρχουν αγαπημένες διαδρομές.":"No favourite routes saved.","Δεν υπάρχουν πρόσφατες αναζητήσεις.":"No recent searches.","τιμή στον επίσημο φορέα":"fare from the official operator","Άνοιγμα":"Open","Διαγραφή":"Delete","ΟΔΗΓΙΕΣ":"GUIDE","Έλεγξε τις εποχικές διαδρομές":"Check seasonal services","Η Beta 1.5 συγκρίνει την ημερομηνία ταξιδιού με ελεγμένες περιόδους λειτουργίας του 2026 και καταχωρισμένες χειμερινές υπηρεσίες 2026–27. Πάτησε «Επίσημη πηγή» για τελική επιβεβαίωση. Οι ενδείξεις «Απαιτείται έλεγχος» ή «Δεν επιβεβαιώθηκε» δεν πρέπει να χρησιμοποιούνται ως εγγύηση δρομολογίου.":"Beta 1.5 compares the selected travel date with verified 2026 operating periods and recorded winter services for 2026–27. Open the official source for final confirmation. A “Check required” or “Not confirmed” label must not be treated as a guarantee that the service will run.","Verified Seasonal Europe: 24 μεγάλες εποχικές υπηρεσίες, περίοδοι 2026–27, κατάσταση βάσει ημερομηνίας και επίσημη πηγή ανά υπηρεσία.":"Verified Seasonal Europe: 24 major seasonal services, 2026–27 operating periods, date-based status and an official source for each service.","Επίσημη πηγή":"Official source","Απαιτείται έλεγχος":"Check required","Δεν επιβεβαιώθηκε":"Not confirmed","Σιδηροδρομικός Σταθμός":"Railway Station","Νέος Σιδηροδρομικός Σταθμός":"New Railway Station","Σταθμός Αθηνών (Λαρίσης)":"Athens Railway Station (Larissis)","Κοντινότερος χρήσιμος σταθμός:":"Nearest useful station:","Προβολή στον χάρτη":"View on map","Υπάρχει σιδηροδρομικός σταθμός στην πόλη":"There is a railway station in the city","Δεν υπάρχει σιδηροδρομικός σταθμός στην πόλη":"There is no railway station in the city","Έλεγξε τα διαθέσιμα επιβατικά δρομολόγια":"Check available passenger services","ΚΟΝΤΙΝΟΤΕΡΟΙ ΣΥΝΟΡΙΑΚΟΙ ΣΤΑΘΜΟΙ":"NEAREST BORDER STATIONS","Οι σταθμοί παρουσιάζονται ως σημεία πρόσβασης κοντά στα σύνορα. Πριν φύγεις, έλεγξε ότι λειτουργεί το συγκεκριμένο δρομολόγιο και πώς θα μεταβείς στον σταθμό.":"The stations are shown as access points near the border. Before travelling, confirm that the service operates and how you will reach the station.","Κατάταξη με βάση την πρακτική πρόσβαση από την επιλεγμένη πόλη και τη λογική της V23. Οι προτάσεις εμφανίζονται σε ίδιες κάρτες για πιο καθαρή σύγκριση.":"The ranking is based on practical access from the selected city. Suggestions use matching cards for easier comparison.","Η διαδρομή αποθηκεύτηκε.":"Route saved.","επιβάτες":"passengers","επιβάτης":"passenger"});
+Object.assign(I18N.de, {"Μενού • BETA 1.5":"Menü • BETA 1.5","ΚΥΡΙΑ":"HAUPTBEREICH","⚠️ Είσαι offline — λειτουργούν τα αποθηκευμένα δεδομένα.":"⚠️ Du bist offline — gespeicherte Daten bleiben verfügbar.","🚆 Διαδρομή":"🚆 Route","📍 Από πού;":"📍 Ausgangspunkt","🚉 Σταθμοί":"🚉 Bahnhöfe","🏛️ Πόλη":"🏛️ Stadt","❤️ Αγαπημένα":"❤️ Favoriten","κύριο ευρωπαϊκό δίκτυο":"europäisches Hauptnetz","Άφιξη:":"Ankunft:","Τελικός προορισμός":"Endziel","Ξενοδοχεία στον χάρτη":"Hotels auf der Karte","Η εφαρμογή είναι βοηθητικός ταξιδιωτικός οδηγός. Οι πραγματικές ώρες, τιμές, διαθεσιμότητα, απεργίες και αλλαγές επιβεβαιώνονται πάντα επίσημα.":"Die App ist ein Reiseplanungsassistent. Tatsächliche Fahrzeiten, Preise, Verfügbarkeiten, Streiks und Umstiege müssen immer über offizielle Quellen bestätigt werden.","Έλεγξε πρώτα τον πίνακα αναχωρήσεων και μετά τον επίσημο φορέα. Μην αγοράσεις νέο εισιτήριο πριν μιλήσεις με προσωπικό, ειδικά με ενιαίο εισιτήριο.":"Prüfe zuerst die Abfahrtstafel und danach den offiziellen Betreiber. Kaufe kein neues Ticket, bevor du mit dem Personal gesprochen hast, besonders bei einem durchgehenden Ticket.","Σε ακύρωση ή μεγάλη καθυστέρηση μπορεί να δικαιούσαι επαναδρομολόγηση, επιστροφή χρημάτων ή αποζημίωση. Οι τελικοί όροι επιβεβαιώνονται στον φορέα έκδοσης.":"Bei einer Zugausfall oder großen Verspätung kannst du Anspruch auf Weiterbeförderung, Erstattung oder Entschädigung haben. Die endgültigen Bedingungen bestätigt die ausstellende Stelle.","Κράτησε εισιτήριο, στιγμιότυπο καθυστέρησης ή ακύρωσης, αποδείξεις εξόδων και γραπτή επιβεβαίωση.":"Bewahre Ticket, Screenshot der Verspätung oder des Ausfalls, Ausgabenbelege und eine schriftliche Bestätigung auf.","Μην πετάξεις εισιτήρια ή αποδείξεις μέχρι να ολοκληρωθεί το αίτημα.":"Wirf Tickets oder Belege nicht weg, bevor der Antrag abgeschlossen ist.","Χρησιμοποίησε εκδοτήριο, γραφείο πληροφοριών ή την επίσημη ιστοσελίδα της χώρας όπου παρουσιάστηκε το πρόβλημα.":"Nutze einen Fahrkartenschalter, die Information oder die offizielle Website des Landes, in dem das Problem aufgetreten ist.","Επίσημος φορέας προορισμού":"Offizieller Betreiber am Zielort","ΓΡΗΓΟΡΟΣ ΟΔΗΓΟΣ":"SCHNELLHILFE","Τι κάνω αμέσως":"Was du sofort tun solltest","Κράτησε στιγμιότυπο καθυστέρησης ή ακύρωσης.":"Speichere einen Screenshot der Verspätung oder des Ausfalls.","Μίλησε με προσωπικό πριν αγοράσεις νέο εισιτήριο.":"Sprich mit dem Personal, bevor du ein neues Ticket kaufst.","Ζήτησε γραπτή επιβεβαίωση αν χάθηκε η ανταπόκριση.":"Bitte um eine schriftliche Bestätigung, wenn du einen Anschluss verpasst hast.","Φύλαξε όλες τις αποδείξεις.":"Bewahre alle Belege auf.","Έλεγξε αν τα εισιτήρια είναι ενιαία ή ξεχωριστά.":"Prüfe, ob es sich um ein durchgehendes oder um getrennte Tickets handelt.","Διάλεξε ελληνική πόλη και θα δεις τους κοντινότερους σιδηροδρομικούς σταθμούς κοντά στα σύνορα.":"Wähle eine griechische Stadt, um die praktischsten Bahnhöfe nahe der Grenze zu sehen.","Διάλεξε πόλη και πάτησε το κουμπί.":"Wähle eine Stadt und drücke die Schaltfläche.","Δεν υπάρχουν αγαπημένες διαδρομές.":"Keine Favoriten gespeichert.","Δεν υπάρχουν πρόσφατες αναζητήσεις.":"Keine letzten Suchanfragen.","τιμή στον επίσημο φορέα":"Preis beim offiziellen Betreiber","Άνοιγμα":"Öffnen","Διαγραφή":"Löschen","ΟΔΗΓΙΕΣ":"ANLEITUNG","Έλεγξε τις εποχικές διαδρομές":"Saisonale Verbindungen prüfen","Η Beta 1.5 συγκρίνει την ημερομηνία ταξιδιού με ελεγμένες περιόδους λειτουργίας του 2026 και καταχωρισμένες χειμερινές υπηρεσίες 2026–27. Πάτησε «Επίσημη πηγή» για τελική επιβεβαίωση. Οι ενδείξεις «Απαιτείται έλεγχος» ή «Δεν επιβεβαιώθηκε» δεν πρέπει να χρησιμοποιούνται ως εγγύηση δρομολογίου.":"Beta 1.5 vergleicht das gewählte Reisedatum mit bestätigten Betriebszeiträumen 2026 und erfassten Winterverbindungen 2026–27. Öffne die offizielle Quelle zur endgültigen Bestätigung. Die Hinweise „Prüfung erforderlich“ oder „Nicht bestätigt“ sind keine Garantie dafür, dass die Verbindung fährt.","Verified Seasonal Europe: 24 μεγάλες εποχικές υπηρεσίες, περίοδοι 2026–27, κατάσταση βάσει ημερομηνίας και επίσημη πηγή ανά υπηρεσία.":"Verified Seasonal Europe: 24 bedeutende saisonale Verbindungen, Betriebszeiträume 2026–27, datumsabhängiger Status und eine offizielle Quelle je Verbindung.","Επίσημη πηγή":"Offizielle Quelle","Απαιτείται έλεγχος":"Prüfung erforderlich","Δεν επιβεβαιώθηκε":"Nicht bestätigt","Σιδηροδρομικός Σταθμός":"Bahnhof","Νέος Σιδηροδρομικός Σταθμός":"Neuer Bahnhof","Σταθμός Αθηνών (Λαρίσης)":"Bahnhof Athen (Larissis)","Κοντινότερος χρήσιμος σταθμός:":"Nächster geeigneter Bahnhof:","Προβολή στον χάρτη":"Auf der Karte anzeigen","Υπάρχει σιδηροδρομικός σταθμός στην πόλη":"In der Stadt gibt es einen Bahnhof","Δεν υπάρχει σιδηροδρομικός σταθμός στην πόλη":"In der Stadt gibt es keinen Bahnhof","Έλεγξε τα διαθέσιμα επιβατικά δρομολόγια":"Verfügbare Personenzüge prüfen","ΚΟΝΤΙΝΟΤΕΡΟΙ ΣΥΝΟΡΙΑΚΟΙ ΣΤΑΘΜΟΙ":"NÄCHSTE GRENZBAHNHÖFE","Οι σταθμοί παρουσιάζονται ως σημεία πρόσβασης κοντά στα σύνορα. Πριν φύγεις, έλεγξε ότι λειτουργεί το συγκεκριμένο δρομολόγιο και πώς θα μεταβείς στον σταθμό.":"Die Bahnhöfe werden als Zugangspunkte nahe der Grenze angezeigt. Prüfe vor der Reise, ob die Verbindung fährt und wie du den Bahnhof erreichst.","Κατάταξη με βάση την πρακτική πρόσβαση από την επιλεγμένη πόλη και τη λογική της V23. Οι προτάσεις εμφανίζονται σε ίδιες κάρτες για πιο καθαρή σύγκριση.":"Die Rangfolge basiert auf der praktischen Erreichbarkeit von der ausgewählten Stadt. Einheitliche Karten erleichtern den Vergleich.","Η διαδρομή αποθηκεύτηκε.":"Route gespeichert.","επιβάτες":"Fahrgäste","επιβάτης":"Fahrgast"});
+
 const LOCATION_I18N={"en": {"Ελλάδα": "Greece", "Βουλγαρία": "Bulgaria", "Σερβία": "Serbia", "Ουγγαρία": "Hungary", "Αυστρία": "Austria", "Ελβετία": "Switzerland", "Ιταλία": "Italy", "Γαλλία": "France", "Γερμανία": "Germany", "Τσεχία": "Czechia", "Σλοβακία": "Slovakia", "Σλοβενία": "Slovenia", "Κροατία": "Croatia", "Ολλανδία": "Netherlands", "Βέλγιο": "Belgium", "Ισπανία": "Spain", "Δανία": "Denmark", "Βόρεια Μακεδονία": "North Macedonia", "Τουρκία": "Türkiye", "Αλεξανδρούπολη": "Alexandroupoli", "Ορεστιάδα": "Orestiada", "Διδυμότειχο": "Didymoteicho", "Κομοτηνή": "Komotini", "Ξάνθη": "Xanthi", "Καβάλα": "Kavala", "Δράμα": "Drama", "Σέρρες": "Serres", "Θεσσαλονίκη": "Thessaloniki", "Κιλκίς": "Kilkis", "Πολύκαστρο": "Polykastro", "Έδεσσα": "Edessa", "Γιαννιτσά": "Giannitsa", "Φλώρινα": "Florina", "Καστοριά": "Kastoria", "Κοζάνη": "Kozani", "Βέροια": "Veria", "Κατερίνη": "Katerini", "Ιωάννινα": "Ioannina", "Λάρισα": "Larissa", "Βόλος": "Volos", "Αθήνα": "Athens", "Κάρτζαλι": "Kardzhali", "Πλόβντιβ": "Plovdiv", "Σόφια": "Sofia", "Βελιγράδι": "Belgrade", "Νις": "Niš", "Βουδαπέστη": "Budapest", "Βιέννη": "Vienna", "Σάλτσμπουργκ": "Salzburg", "Ίνσμπρουκ": "Innsbruck", "Γκρατς": "Graz", "Λιντς": "Linz", "Ζυρίχη": "Zurich", "Γενεύη": "Geneva", "Βασιλεία": "Basel", "Βέρνη": "Bern", "Λουκέρνη": "Lucerne", "Μιλάνο": "Milan", "Ρώμη": "Rome", "Φλωρεντία": "Florence", "Βενετία": "Venice", "Μπολόνια": "Bologna", "Τορίνο": "Turin", "Νάπολη": "Naples", "Γένοβα": "Genoa", "Παρίσι": "Paris", "Λυών": "Lyon", "Μασσαλία": "Marseille", "Στρασβούργο": "Strasbourg", "Λιλ": "Lille", "Νίκαια": "Nice", "Μπορντό": "Bordeaux", "Μόναχο": "Munich", "Φρανκφούρτη": "Frankfurt", "Βερολίνο": "Berlin", "Κολωνία": "Cologne", "Νυρεμβέργη": "Nuremberg", "Αμβούργο": "Hamburg", "Στουτγκάρδη": "Stuttgart", "Λειψία": "Leipzig", "Δρέσδη": "Dresden", "Ανόβερο": "Hanover", "Πράγα": "Prague", "Μπρνο": "Brno", "Οστράβα": "Ostrava", "Μπρατισλάβα": "Bratislava", "Λιουμπλιάνα": "Ljubljana", "Μάριμπορ": "Maribor", "Ζάγκρεμπ": "Zagreb", "Σπλιτ": "Split", "Άμστερνταμ": "Amsterdam", "Ρότερνταμ": "Rotterdam", "Ουτρέχτη": "Utrecht", "Βρυξέλλες": "Brussels", "Αμβέρσα": "Antwerp", "Γάνδη": "Ghent", "Βαρκελώνη": "Barcelona", "Μαδρίτη": "Madrid", "Βαλένθια": "Valencia", "Σεβίλλη": "Sevilla", "Βαλένθια": "Valencia", "Σεβίλλη": "Seville", "Κοπεγχάγη": "Copenhagen", "1 επιβάτης": "1 passenger", "2 επιβάτες": "2 passengers", "3 επιβάτες": "3 passengers", "4 επιβάτες": "4 passengers", "5 επιβάτες": "5 passengers", "Ενήλικας": "Adult", "Νέος έως 27": "Youth up to 27", "Άνω των 65": "Over 65", "Οικογένεια": "Family", "Δεν γνωρίζω ακόμη": "Not decided yet", "Ενιαίο εισιτήριο": "Through ticket", "Ξεχωριστά εισιτήρια ανά σκέλος": "Separate tickets by leg", "Χωρίς διαμονή": "No accommodation", "1 νύχτα": "1 night", "2 νύχτες": "2 nights", "3 νύχτες": "3 nights", "4 νύχτες": "4 nights", "5 νύχτες": "5 nights", "Χωρίς καθυστέρηση": "No delay", "10 λεπτά": "10 minutes", "20 λεπτά": "20 minutes", "30 λεπτά": "30 minutes", "60 λεπτά": "60 minutes", "15 λεπτά": "15 minutes", "45 λεπτά": "45 minutes", "Ντόρτμουντ": "Dortmund", "Ντίσελντορφ": "Düsseldorf", "Βρέμη": "Bremen", "Έσσεν": "Essen", "Μάνχαϊμ": "Mannheim", "Καρλσρούη": "Karlsruhe", "Φράιμπουργκ": "Freiburg", "Τουλούζη": "Toulouse", "Μονπελιέ": "Montpellier", "Νάντη": "Nantes", "Ρεν": "Rennes", "Γκρενόμπλ": "Grenoble", "Αβινιόν": "Avignon", "Βερόνα": "Verona", "Πίζα": "Pisa", "Μπάρι": "Bari", "Παλέρμο": "Palermo", "Τεργέστη": "Trieste", "Πάντοβα": "Padua", "Μάλαγα": "Malaga", "Σαραγόσα": "Zaragoza", "Αλικάντε": "Alicante", "Μπιλμπάο": "Bilbao", "Γρανάδα": "Granada", "Κόρδοβα": "Cordoba", "Κλάγκενφουρτ": "Klagenfurt", "Λωζάνη": "Lausanne", "Ιντερλάκεν": "Interlaken", "Χάγη": "The Hague", "Αϊντχόφεν": "Eindhoven", "Μπριζ": "Bruges", "Λιέγη": "Liège"}, "de": {"Ελλάδα": "Griechenland", "Βουλγαρία": "Bulgarien", "Σερβία": "Serbien", "Ουγγαρία": "Ungarn", "Αυστρία": "Österreich", "Ελβετία": "Schweiz", "Ιταλία": "Italien", "Γαλλία": "Frankreich", "Γερμανία": "Deutschland", "Τσεχία": "Tschechien", "Σλοβακία": "Slowakei", "Σλοβενία": "Slowenien", "Κροατία": "Kroatien", "Ολλανδία": "Niederlande", "Βέλγιο": "Belgien", "Ισπανία": "Spanien", "Δανία": "Dänemark", "Βόρεια Μακεδονία": "Nordmazedonien", "Τουρκία": "Türkei", "Αλεξανδρούπολη": "Alexandroupoli", "Ορεστιάδα": "Orestiada", "Διδυμότειχο": "Didymoteicho", "Κομοτηνή": "Komotini", "Ξάνθη": "Xanthi", "Καβάλα": "Kavala", "Δράμα": "Drama", "Σέρρες": "Serres", "Θεσσαλονίκη": "Thessaloniki", "Κιλκίς": "Kilkis", "Πολύκαστρο": "Polykastro", "Έδεσσα": "Edessa", "Γιαννιτσά": "Giannitsa", "Φλώρινα": "Florina", "Καστοριά": "Kastoria", "Κοζάνη": "Kozani", "Βέροια": "Veria", "Κατερίνη": "Katerini", "Ιωάννινα": "Ioannina", "Λάρισα": "Larisa", "Βόλος": "Volos", "Αθήνα": "Athen", "Κάρτζαλι": "Kardschali", "Πλόβντιβ": "Plowdiw", "Σόφια": "Sofia", "Βελιγράδι": "Belgrad", "Νις": "Niš", "Βουδαπέστη": "Budapest", "Βιέννη": "Wien", "Σάλτσμπουργκ": "Salzburg", "Ίνσμπρουκ": "Innsbruck", "Γκρατς": "Graz", "Λιντς": "Linz", "Ζυρίχη": "Zürich", "Γενεύη": "Genf", "Βασιλεία": "Basel", "Βέρνη": "Bern", "Λουκέρνη": "Luzern", "Μιλάνο": "Mailand", "Ρώμη": "Rom", "Φλωρεντία": "Florenz", "Βενετία": "Venedig", "Μπολόνια": "Bologna", "Τορίνο": "Turin", "Νάπολη": "Neapel", "Γένοβα": "Genua", "Παρίσι": "Paris", "Λυών": "Lyon", "Μασσαλία": "Marseille", "Στρασβούργο": "Straßburg", "Λιλ": "Lille", "Νίκαια": "Nizza", "Μπορντό": "Bordeaux", "Μόναχο": "München", "Φρανκφούρτη": "Frankfurt", "Βερολίνο": "Berlin", "Κολωνία": "Köln", "Νυρεμβέργη": "Nürnberg", "Αμβούργο": "Hamburg", "Στουτγκάρδη": "Stuttgart", "Λειψία": "Leipzig", "Δρέσδη": "Dresden", "Ανόβερο": "Hannover", "Πράγα": "Prag", "Μπρνο": "Brünn", "Οστράβα": "Ostrau", "Μπρατισλάβα": "Bratislava", "Λιουμπλιάνα": "Ljubljana", "Μάριμπορ": "Maribor", "Ζάγκρεμπ": "Zagreb", "Σπλιτ": "Split", "Άμστερνταμ": "Amsterdam", "Ρότερνταμ": "Rotterdam", "Ουτρέχτη": "Utrecht", "Βρυξέλλες": "Brüssel", "Αμβέρσα": "Antwerpen", "Γάνδη": "Gent", "Βαρκελώνη": "Barcelona", "Μαδρίτη": "Madrid", "Βαλένθια": "Valencia", "Σεβίλλη": "Sevilla", "Βαλένθια": "Valencia", "Σεβίλλη": "Seville", "Κοπεγχάγη": "Kopenhagen", "1 επιβάτης": "1 Fahrgast", "2 επιβάτες": "2 Fahrgäste", "3 επιβάτες": "3 Fahrgäste", "4 επιβάτες": "4 Fahrgäste", "5 επιβάτες": "5 Fahrgäste", "Ενήλικας": "Erwachsener", "Νέος έως 27": "Junge Reisende bis 27", "Άνω των 65": "Über 65", "Οικογένεια": "Familie", "Δεν γνωρίζω ακόμη": "Noch nicht entschieden", "Ενιαίο εισιτήριο": "Durchgehendes Ticket", "Ξεχωριστά εισιτήρια ανά σκέλος": "Separate Tickets je Abschnitt", "Χωρίς διαμονή": "Ohne Unterkunft", "1 νύχτα": "1 Nacht", "2 νύχτες": "2 Nächte", "3 νύχτες": "3 Nächte", "4 νύχτες": "4 Nächte", "5 νύχτες": "5 Nächte", "Χωρίς καθυστέρηση": "Keine Verspätung", "10 λεπτά": "10 Minuten", "20 λεπτά": "20 Minuten", "30 λεπτά": "30 Minuten", "60 λεπτά": "60 Minuten", "15 λεπτά": "15 Minuten", "45 λεπτά": "45 Minuten", "Ντόρτμουντ": "Dortmund", "Ντίσελντορφ": "Düsseldorf", "Βρέμη": "Bremen", "Έσσεν": "Essen", "Μάνχαϊμ": "Mannheim", "Καρλσρούη": "Karlsruhe", "Φράιμπουργκ": "Freiburg", "Τουλούζη": "Toulouse", "Μονπελιέ": "Montpellier", "Νάντη": "Nantes", "Ρεν": "Rennes", "Γκρενόμπλ": "Grenoble", "Αβινιόν": "Avignon", "Βερόνα": "Verona", "Πίζα": "Pisa", "Μπάρι": "Bari", "Παλέρμο": "Palermo", "Τεργέστη": "Triest", "Πάντοβα": "Padua", "Μάλαγα": "Málaga", "Σαραγόσα": "Saragossa", "Αλικάντε": "Alicante", "Μπιλμπάο": "Bilbao", "Γρανάδα": "Granada", "Κόρδοβα": "Córdoba", "Κλάγκενφουρτ": "Klagenfurt", "Λωζάνη": "Lausanne", "Ιντερλάκεν": "Interlaken", "Χάγη": "Den Haag", "Αϊντχόφεν": "Eindhoven", "Μπριζ": "Brügge", "Λιέγη": "Lüttich"}};
 
 
@@ -2331,39 +2369,25 @@ const GREEK_DISPLAY_ALIASES={
 
 function localizeRouteString(value,lang=currentLanguage){
  let text=translateTextValue(String(value??""),lang);
- const replacements={
-  "Αλεξανδρούπολη":localizePlace("Αλεξανδρούπολη",lang),
-  "Σβίλενγκραντ":localizePlace("Svilengrad",lang),
-  "Svilengrad":localizePlace("Svilengrad",lang),
-  "Σόφια":localizePlace("Sofia",lang),
-  "Sofia":localizePlace("Sofia",lang),
-  "Χαλκαλί":localizePlace("Halkali",lang),
-  "Halkali":localizePlace("Halkali",lang),
-  "Halkalı":localizePlace("Halkalı",lang),
-  "Εσκισεχίρ":localizePlace("Eskişehir",lang),
-  "Eskişehir":localizePlace("Eskişehir",lang),
-  "Ποντκόβα":localizePlace("Podkova",lang),
-  "Podkova":localizePlace("Podkova",lang),
-  "Κάρτζαλι":localizePlace("Kardzhali",lang),
-  "Kardzhali":localizePlace("Kardzhali",lang),
-  "Κούλατα":localizePlace("Kulata",lang),
-  "Kulata":localizePlace("Kulata",lang),
-  "Αδριανούπολη":localizePlace("Edirne",lang),
-  "Edirne":localizePlace("Edirne",lang),
-  "Ντιμίτροβγκραντ":localizePlace("Dimitrovgrad",lang),
-  "Dimitrovgrad":localizePlace("Dimitrovgrad",lang),
-  "Γκόρνα Οριάχοβιτσα":localizePlace("Gorna Orjahovitsa",lang),
-  "Gorna Orjahovitsa":localizePlace("Gorna Orjahovitsa",lang),
-  "Ρούσε":localizePlace("Ruse",lang),
-  "Ruse":localizePlace("Ruse",lang),
-  "Βουκουρέστι":localizePlace("Bucharest",lang),
-  "Bucharest":localizePlace("Bucharest",lang),
-  "Βουδαπέστη":localizePlace("Budapest",lang),
-  "Budapest":localizePlace("Budapest",lang)
+ const aliases={
+  "Σβίλενγκραντ":"Svilengrad","Σόφια":"Sofia","Χαλκαλί":"Halkalı","Εσκισεχίρ":"Eskişehir",
+  "Ποντκόβα":"Podkova","Κάρτζαλι":"Kardzhali","Κούλατα":"Kulata","Αδριανούπολη":"Edirne",
+  "Ντιμίτροβγκραντ":"Dimitrovgrad","Γκόρνα Οριάχοβιτσα":"Gorna Orjahovitsa","Ρούσε":"Ruse",
+  "Βουκουρέστι":"Bucharest","Βουδαπέστη":"Budapest"
  };
- Object.keys(replacements).sort((a,b)=>b.length-a.length).forEach(key=>{
-  text=text.split(key).join(replacements[key]);
+ Object.entries(aliases).forEach(([display,base])=>{
+  text=text.split(display).join(localizePlace(base,lang));
  });
+ if(lang!=="el"){
+  const placeMap=LOCATION_I18N[lang]||{};
+  Object.keys(placeMap).sort((a,b)=>b.length-a.length).forEach(key=>{
+    if(text.includes(key)) text=text.split(key).join(placeMap[key]);
+  });
+ }else{
+  Object.entries(GREEK_DISPLAY_ALIASES).sort((a,b)=>b[0].length-a[0].length).forEach(([base,display])=>{
+    if(text.includes(base)) text=text.split(base).join(display);
+  });
+ }
  return text;
 }
 
@@ -2471,9 +2495,9 @@ function renderTicketPlan(steps,fc,tc){
 
 
 const CRITICAL_UI={
- el:{hero:"Η πύλη σου στο ευρωπαϊκό σιδηροδρομικό δίκτυο",recommended:"ΠΡΟΤΕΙΝΟΜΕΝΗ ΔΙΑΔΡΟΜΗ",changes:"αλλαγές",fare:"τιμή εισιτηρίου",final:"τελική επιβεβαίωση",check:"Έλεγχος",official:"Επίσημος φορέας",buy:"Αγορά εισιτηρίου"},
- en:{hero:"Your gateway to Europe’s rail network",recommended:"RECOMMENDED ROUTE",changes:"changes",fare:"ticket fare",final:"final confirmation",check:"Check fare",official:"Official operator",buy:"Buy ticket"},
- de:{hero:"Dein Zugang zum europäischen Bahnnetz",recommended:"EMPFOHLENE ROUTE",changes:"Umstiege",fare:"Fahrpreis",final:"endgültige Bestätigung",check:"Preis prüfen",official:"Offizieller Anbieter",buy:"Ticket kaufen"}
+ el:{hero:"Η πύλη σου στο ευρωπαϊκό σιδηροδρομικό δίκτυο",recommended:"ΠΡΟΤΕΙΝΟΜΕΝΗ ΔΙΑΔΡΟΜΗ",changes:"Αλλαγές τρένων",fareMain:"Έλεγχος τιμής",fareSub:"εισιτηρίου",finalMain:"Τελική επιβεβαίωση",finalSub:"από τον επίσημο φορέα",buy:"Αγορά εισιτηρίου",cityDays:"2 ημέρες",stay:"πρόταση παραμονής",transport:"τοπική μετακίνηση",cost:"ενδεικτικό κόστος",appStatus:"📊 Κατάσταση εφαρμογής",connection:"σύνδεση",favorites:"αγαπημένα",recent:"πρόσφατες αναζητήσεις",online:"Online",offline:"Offline",install:"Εγκατάσταση εφαρμογής",installed:"Η εφαρμογή είναι εγκατεστημένη"},
+ en:{hero:"Your gateway to Europe’s rail network",recommended:"RECOMMENDED ROUTE",changes:"Train changes",fareMain:"Check ticket fare",fareSub:"with the official operator",finalMain:"Final confirmation",finalSub:"from the official operator",buy:"Buy ticket",cityDays:"2 days",stay:"suggested stay",transport:"local transport",cost:"estimated cost",appStatus:"📊 App status",connection:"connection",favorites:"favourites",recent:"recent searches",online:"Online",offline:"Offline",install:"Install app",installed:"App installed"},
+ de:{hero:"Dein Zugang zum europäischen Bahnnetz",recommended:"EMPFOHLENE ROUTE",changes:"Umstiege",fareMain:"Fahrpreis prüfen",fareSub:"beim offiziellen Betreiber",finalMain:"Endgültige Bestätigung",finalSub:"beim offiziellen Betreiber",buy:"Ticket kaufen",cityDays:"2 Tage",stay:"empfohlener Aufenthalt",transport:"Nahverkehr",cost:"geschätzte Kosten",appStatus:"📊 App-Status",connection:"Verbindung",favorites:"Favoriten",recent:"letzte Suchanfragen",online:"Online",offline:"Offline",install:"App installieren",installed:"App ist installiert"}
 };
 function uiPack(lang=currentLanguage){return CRITICAL_UI[lang]||CRITICAL_UI.el}
 function categoryText(value,lang=currentLanguage){
@@ -2490,8 +2514,18 @@ function applyCriticalTranslations(){
  if($("heroSlogan")) $("heroSlogan").textContent=u.hero;
  if($("recommendedRouteTag")) $("recommendedRouteTag").textContent=u.recommended;
  if($("changesLabel")) $("changesLabel").textContent=u.changes;
- if($("perPersonLabel")) $("perPersonLabel").textContent=u.fare;
- if($("grandLabel")) $("grandLabel").textContent=u.final;
+ if($("perPerson")) $("perPerson").textContent=u.fareMain;
+ if($("perPersonLabel")) $("perPersonLabel").textContent=u.fareSub;
+ if($("grand")) $("grand").textContent=u.finalMain;
+ if($("grandLabel")) $("grandLabel").textContent=u.finalSub;
+ if($("cityDays")) $("cityDays").textContent=u.cityDays;
+ if($("cityDaysLabel")) $("cityDaysLabel").textContent=u.stay;
+ if($("cityTransportLabel")) $("cityTransportLabel").textContent=u.transport;
+ if($("cityBudgetLabel")) $("cityBudgetLabel").textContent=u.cost;
+ if($("appStatusTitle")) $("appStatusTitle").textContent=u.appStatus;
+ if($("onlineStatusLabel")) $("onlineStatusLabel").textContent=u.connection;
+ if($("favCountLabel")) $("favCountLabel").textContent=u.favorites;
+ if($("historyCountLabel")) $("historyCountLabel").textContent=u.recent;
 }
 function setGatewayLanguage(data){
  if(!data) return;
@@ -2623,13 +2657,19 @@ function translateDynamicLabels(){
 const I18N_BASE=new WeakMap();
 let currentLanguage=localStorage.getItem("railLanguage")||"el";
 
+function escapeRegExp(value){return String(value).replace(/[.*+?^${}()|[\]\\]/g,"\\$&");}
 function translateTextValue(original,lang){
   if(lang==="el") return original;
   const dict=I18N[lang]||{};
-  if(dict[original]) return dict[original];
-  let result=original;
+  if(Object.prototype.hasOwnProperty.call(dict,original)) return dict[original];
+  let result=String(original);
   Object.keys(dict).sort((a,b)=>b.length-a.length).forEach(key=>{
-    if(result.includes(key)) result=result.split(key).join(dict[key]);
+    if(!result.includes(key)) return;
+    const first=key.charAt(0),last=key.charAt(key.length-1);
+    const left=/[\p{L}\p{N}]/u.test(first)?"(?<![\p{L}\p{N}])":"";
+    const right=/[\p{L}\p{N}]/u.test(last)?"(?![\p{L}\p{N}])":"";
+    try{result=result.replace(new RegExp(left+escapeRegExp(key)+right,"gu"),dict[key]);}
+    catch{result=result.split(key).join(dict[key]);}
   });
   return result;
 }
@@ -2828,6 +2868,9 @@ function setLanguage(lang){
   if(typeof renderCity==="function") renderCity(currentCityName||"Βιέννη");
   if(typeof renderStations==="function") renderStations($("stationSearch")?.value||"");
   if(typeof renderSaved==="function") renderSaved();
+  applyCriticalTranslations();
+  network();
+  updateInstallButtonState();
 }
 
 const langSelectElement=$("langSelect"); if(langSelectElement) langSelectElement.addEventListener("change",e=>setLanguage(e.target.value));
@@ -2854,10 +2897,18 @@ fillCountries();normalizePlannerValues();translateAllOptions();updatePlannerMapB
 
 <script>
 if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker.register("./sw.js?v=beta-1-5-translations", { scope: "./" })
-      .then(() => console.log("Rail Start Europe service worker active"))
-      .catch(error => console.error("Service worker registration failed:", error));
+  window.addEventListener("load", async () => {
+    const migrationKey="rse-beta-1-5-i18n2-cache-20260805";
+    try{
+      if(!localStorage.getItem(migrationKey) && "caches" in window){
+        const keys=await caches.keys();
+        await Promise.all(keys.filter(k=>/rail-start-europe|rse/i.test(k)).map(k=>caches.delete(k)));
+        localStorage.setItem(migrationKey,"1");
+      }
+      const registration=await navigator.serviceWorker.register("./sw.js?v=beta-1-5-i18n2-20260805",{scope:"./"});
+      await registration.update();
+      console.log("Rail Start Europe service worker active");
+    }catch(error){console.error("Service worker registration failed:",error);}
   });
 }
 </script>
