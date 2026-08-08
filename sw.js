@@ -1,65 +1,62 @@
-const CACHE_NAME = "rail-start-europe-beta-1-0";
+const CACHE_NAME = "rail-start-europe-beta-1-48";
 const APP_SHELL = [
   "./",
   "./index.html",
-  "./offline.html",
-  "./manifest.webmanifest",
-  "./favicon.ico",
-  "./icon-32.png",
-  "./icon-48.png",
-  "./icon-72.png",
-  "./icon-96.png",
-  "./icon-128.png",
-  "./icon-144.png",
-  "./icon-152.png",
+  "./manifest.webmanifest?v=1.48",
   "./icon-180.png",
   "./icon-192.png",
-  "./icon-384.png",
   "./icon-512.png",
-  "./icon-maskable-192.png",
-  "./icon-maskable-512.png"
+  "./icon-maskable-512.png",
+  "./favicon.ico"
 ];
 
 self.addEventListener("install", event => {
   self.skipWaiting();
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache =>
-      Promise.allSettled(APP_SHELL.map(url => cache.add(url)))
-    )
+    caches.open(CACHE_NAME).then(cache => cache.addAll(APP_SHELL)).catch(() => undefined)
   );
 });
 
 self.addEventListener("activate", event => {
-  event.waitUntil(
-    caches.keys().then(keys => Promise.all(
-      keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key))
-    )).then(() => self.clients.claim())
-  );
+  event.waitUntil((async () => {
+    const keys = await caches.keys();
+    await Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)));
+    await self.clients.claim();
+  })());
 });
 
 self.addEventListener("fetch", event => {
-  if (event.request.method !== "GET") return;
-  const url = new URL(event.request.url);
-  if (url.origin !== self.location.origin) return;
+  const request = event.request;
+  if (request.method !== "GET") return;
+  const url = new URL(request.url);
 
-  if (event.request.mode === "navigate") {
-    event.respondWith(
-      fetch(event.request)
-        .then(response => {
-          const copy = response.clone();
-          caches.open(CACHE_NAME).then(cache => cache.put(event.request, copy));
-          return response;
-        })
-        .catch(() => caches.match(event.request).then(r => r || caches.match("./index.html") || caches.match("./offline.html")))
-    );
+  // Always prefer the network for page navigation so GitHub updates appear quickly.
+  if (request.mode === "navigate") {
+    event.respondWith((async () => {
+      try {
+        const fresh = await fetch(request, {cache: "no-store"});
+        const cache = await caches.open(CACHE_NAME);
+        cache.put("./index.html", fresh.clone());
+        return fresh;
+      } catch (_) {
+        return (await caches.match("./index.html")) || (await caches.match("./"));
+      }
+    })());
     return;
   }
 
-  event.respondWith(
-    caches.match(event.request).then(cached => cached || fetch(event.request).then(response => {
-      const copy = response.clone();
-      caches.open(CACHE_NAME).then(cache => cache.put(event.request, copy));
-      return response;
-    }))
-  );
+  // Local PWA assets: cache first, refresh in background.
+  if (url.origin === self.location.origin) {
+    event.respondWith((async () => {
+      const cached = await caches.match(request);
+      const network = fetch(request).then(async response => {
+        if (response && response.ok) {
+          const cache = await caches.open(CACHE_NAME);
+          cache.put(request, response.clone());
+        }
+        return response;
+      }).catch(() => null);
+      return cached || await network || Response.error();
+    })());
+  }
 });
