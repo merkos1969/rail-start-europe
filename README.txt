@@ -1,21 +1,19 @@
-RAIL START EUROPE — Beta 1.48 FULL PWA PACKAGE
+RAIL START EUROPE — Beta 1.68
 
-Ανέβασε ΟΛΑ τα αρχεία αυτού του φακέλου στη ρίζα του GitHub repository rail-start-europe, αντικαθιστώντας τα παλιά.
+KORZO / GOOGLE MAPS — ΤΕΛΙΚΗ ΔΙΟΡΘΩΣΗ ΑΝΟΙΓΜΑΤΟΣ
 
-Σημαντικό:
-- Το όνομα εγκατάστασης είναι πλέον μόνο: Rail Start Europe
-- Δεν υπάρχει "Beta 1.0" στο manifest.
-- Το νέο sw.js καθαρίζει παλιές cache εκδόσεις.
-- Το index.html χρησιμοποιεί νέο migration key και cache-busting manifest/service worker.
-- Περιλαμβάνονται όλα τα απαιτούμενα PWA icons.
+Στην Beta 1.67 το Korzo άνοιγε σωστά ως προορισμός, αλλά το Google Maps
+έμπαινε αυτόματα σε λειτουργία ΟΔΗΓΙΩΝ από την τρέχουσα τοποθεσία.
 
-Αρχεία:
-index.html
-manifest.webmanifest
-sw.js
-icon-180.png
-icon-192.png
-icon-512.png
-icon-maskable-512.png
-favicon.ico
-.nojekyll
+Beta 1.68:
+• Το Korzo ανοίγει πλέον ως PIN πάνω στον χάρτη.
+• Δεν ξεκινά «Η τοποθεσία σας → Korzo».
+• Χρησιμοποιούνται σταθερές συντεταγμένες:
+  45.326452, 14.442927
+• Οι ίδιες συντεταγμένες χρησιμοποιούνται και στον χάρτη της εποχικής
+  διαδρομής ώστε το marker να βρίσκεται στο σωστό σημείο.
+• Η εμφάνιση στην εφαρμογή παραμένει:
+  Korzo – κεντρικός πεζόδρομος
+• Η γεωκωδικοποίηση cache ανανεώθηκε σε v4.
+
+Beta 1.68
